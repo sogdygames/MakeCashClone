@@ -14,6 +14,8 @@ public class MCCEventManager : MonoBehaviour
     public event Action IncomeButtonClick;
     public event Action NewGPUButtonClick;
 
+    public event Action MergePipesClick;
+
     private void Awake()
     {
         if (current == null)
@@ -47,5 +49,10 @@ public class MCCEventManager : MonoBehaviour
     public void NewGPUButtonClickTrigger()
     {
         NewGPUButtonClick?.Invoke();
+    }
+
+    public void MergePipesClickTrigger()
+    {
+        MergePipesClick?.Invoke();
     }
 }

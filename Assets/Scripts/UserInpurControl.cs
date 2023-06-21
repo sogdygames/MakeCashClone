@@ -27,4 +27,9 @@ public class UserInpurControl : MonoBehaviour
     {
         MCCEventManager.current.NewGPUButtonClickTrigger();
     }
+
+    public void MergePipesClickButton()
+    {
+        MCCEventManager.current.MergePipesClickTrigger();
+    }
 }
