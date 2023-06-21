@@ -1,8 +1,18 @@
 using UnityEngine;
+using DG.Tweening;
 
 public class MCCGameManager : MonoBehaviour
 {
 
+    [SerializeField] private Animator _bigPipeIncoinAnime;
+    [SerializeField] private Animator[] _smallPipeInCoinAnimeList;
+
+    [Header("Generate Coin Related")]
+    [SerializeField] private Transform[] _coinBirthPoints;
+    [SerializeField] private GameObject[] _whiteCoinList;
+    [SerializeField] private GameObject[] _orangeCoinList;
+
+ 
     //Score and Target
     private float _score = 20.0f;
     private float _target = 1000.0f;
@@ -17,6 +27,7 @@ public class MCCGameManager : MonoBehaviour
     private float _targetAmount = 0f;
     private float _newGpuAmount = 0f;
 
+    private int _pipeCount = 4;
 
     private void Start()
     {
@@ -27,6 +38,8 @@ public class MCCGameManager : MonoBehaviour
         MCCEventManager.current.IncomeButtonClick += OnIncomeButtonClicked;
         MCCEventManager.current.NewGPUButtonClick += OnNewGPUButtonClicked;
         MCCEventManager.current.MergePipesClick += OnMergePipeButtonClicked;
+        MCCEventManager.current.StartSmallCoinAnime += OnStartSmallCoinAnimeTriggered;
+        MCCEventManager.current.CoinInPipeFinished += OnCoinInPipeFinishedTriggered;
         #endregion
     }
 
@@ -38,6 +51,7 @@ public class MCCGameManager : MonoBehaviour
         MCCEventManager.current.IncomeButtonClick -= OnIncomeButtonClicked;
         MCCEventManager.current.NewGPUButtonClick -= OnNewGPUButtonClicked;
         MCCEventManager.current.MergePipesClick -= OnMergePipeButtonClicked;
+        MCCEventManager.current.StartSmallCoinAnime -= OnStartSmallCoinAnimeTriggered;
     }
 
 
@@ -45,6 +59,8 @@ public class MCCGameManager : MonoBehaviour
     private void OnScreenTapped()
     {
         Debug.Log("OnScreenTapped");
+        _bigPipeIncoinAnime.SetTrigger(AnimeConst.sendCoinToBigPipe);
+        
     }
 
     private void OnSpeedButtonClicked()
@@ -71,7 +87,68 @@ public class MCCGameManager : MonoBehaviour
     {
         Debug.Log("OnMergePipeButtonClicked");
     }
+
+    private void OnStartSmallCoinAnimeTriggered()
+    {
+        foreach(Animator animator in _smallPipeInCoinAnimeList)
+        {
+            animator.SetTrigger(AnimeConst.sendCoinToSmallPipe);
+        }
+        
+    }
+
+    public void OnCoinInPipeFinishedTriggered()
+    {
+        Debug.Log("OnCoinInPipeFinishedTriggered");
+        GenerateCoin();
+    }
     #endregion
+
+    private void GenerateCoin()
+    {
+        if (_pipeCount >= 1)
+        {
+            IndividualCoinGenerate(_coinBirthPoints[0]);
+        }
+
+        if (_pipeCount >= 2)
+        {
+            IndividualCoinGenerate(_coinBirthPoints[1]);
+        }
+
+        if (_pipeCount >= 3)
+        {
+            IndividualCoinGenerate(_coinBirthPoints[2]);
+        }
+
+        if (_pipeCount >=4)
+        {
+            IndividualCoinGenerate(_coinBirthPoints[3]);
+        }
+    }
+
+    private void IndividualCoinGenerate(Transform newTransform)
+    {
+
+        int value = Random.Range(1, 3);
+
+        foreach (GameObject gO in (value == 1 ? _whiteCoinList : _orangeCoinList))
+        {
+            if (!gO.activeInHierarchy)
+            {
+                gO.GetComponent<Transform>().transform.position = newTransform.position;
+                gO.SetActive(true);
+                DOVirtual.DelayedCall(20, () => {
+                    gO.SetActive(false);
+                });
+
+                break;
+            }
+        }
+
+        
+        
+    }
 
 
 

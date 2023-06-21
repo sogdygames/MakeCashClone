@@ -16,6 +16,9 @@ public class MCCEventManager : MonoBehaviour
 
     public event Action MergePipesClick;
 
+    public event Action StartSmallCoinAnime;
+    public event Action CoinInPipeFinished;
+
     private void Awake()
     {
         if (current == null)
@@ -55,4 +58,15 @@ public class MCCEventManager : MonoBehaviour
     {
         MergePipesClick?.Invoke();
     }
+
+    public void StartSmallCoinAnimeTrigger()
+    {
+        StartSmallCoinAnime?.Invoke();
+    }
+
+    public void CoinInPipeFinishedTrigger()
+    {
+        CoinInPipeFinished?.Invoke();
+    }
+
 }
