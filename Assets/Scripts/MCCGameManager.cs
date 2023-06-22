@@ -6,6 +6,7 @@ public class MCCGameManager : MonoBehaviour
 
     [SerializeField] private Animator _bigPipeIncoinAnime;
     [SerializeField] private Animator[] _smallPipeInCoinAnimeList;
+    [SerializeField] private Animator[] _moneyFloatAnimetorList;
 
     [Header("Generate Coin Related")]
     [SerializeField] private Transform[] _coinBirthPoints;
@@ -101,6 +102,12 @@ public class MCCGameManager : MonoBehaviour
     {
         Debug.Log("OnCoinInPipeFinishedTriggered");
         GenerateCoin();
+
+        foreach (Animator animator in _moneyFloatAnimetorList)
+        {
+            animator.SetTrigger(AnimeConst.moneyFloat);
+        }
+
     }
     #endregion
 
