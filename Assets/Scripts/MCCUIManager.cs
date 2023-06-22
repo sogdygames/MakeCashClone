@@ -33,16 +33,28 @@ public class MCCUIManager : MonoBehaviour
     [Header("Animators")]
     [SerializeField] private Animator _scoreAnimator;
 
-    public void UpdateScore(float value)
+    private void Start()
     {
-        _scoreTMPro.text = "$" + string.Format("{0:0.0}", value);
-        _scoreAnimator.SetTrigger(AnimeConst.scoreAnimate);
+        SetNewGpuSlider(0.2f);
     }
 
-    public void UpdateSpeedButtonView(int level, float price)
+    public void UpdateScore(float value, bool animate)
+    {
+        _scoreTMPro.text = "$" + string.Format("{0:0.0}", value);
+        if (animate)
+        {
+            _scoreAnimator.SetTrigger(AnimeConst.scoreAnimate);
+        }
+
+        SetTargetSlider(value / 1000);
+    }
+
+    public void UpdateSpeedButtonView(int level, float price, int totalLevel)
     {
         _speedLevel.text = "Level " + level.ToString();
         _speedPrice.text = "$" + string.Format("{0:0.0}", price);
+
+        SetNewGpuSlider((float)totalLevel / 10.0f);
     }
 
     public void UpdateAddPipeButtonView(float price)
@@ -50,10 +62,12 @@ public class MCCUIManager : MonoBehaviour
         _addPipePrice.text = "$" + string.Format("{0:0.0}", price);
     }
 
-    public void UpdateIncomeButtonView(int level, float price)
+    public void UpdateIncomeButtonView(int level, float price, int totalLevel)
     {
         _incomeLevel.text = "Level " + level.ToString();
         _incomePrice.text = "$" + string.Format("{0:0.0}", price);
+
+        SetNewGpuSlider((float) totalLevel / 10.0f);
     }
 
     public void UpdateTarget(float value)
@@ -66,7 +80,7 @@ public class MCCUIManager : MonoBehaviour
         _target.text = "Target: $" + target;
     }
 
-    public void SetTargetSlider(float value)
+    private void SetTargetSlider(float value)
     {
         if (value <=1)
         {
@@ -74,8 +88,9 @@ public class MCCUIManager : MonoBehaviour
         }
     }
 
-    public void SetNewGpuSlider(float value)
+    private void SetNewGpuSlider(float value)
     {
+        Debug.Log("MCCUIManager, SetNewGpuSlider, value: " + value.ToString());
         if (value <= 1)
         {
             _newGpuSlider.value = value;

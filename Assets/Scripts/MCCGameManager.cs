@@ -22,16 +22,19 @@ public class MCCGameManager : MonoBehaviour
     [SerializeField] private GameObject _mergePipePanelButton;
     [SerializeField] private GameObject _AddNewGpuPanelButton;
 
+    [Header("FUNS")]
+    [SerializeField] private GameObject _funLevel1;
+    [SerializeField] private GameObject[] _funLeven2List;
+
     private MCCUIManager _uiManager;
+    private AudioSource _coinAudioSource;
 
     //Score and Target
     private float _score = 20.0f;
     private float _target = 1000.0f;
 
-    //Buttons
-    private float _upgradeSpeedPrice = 7.0f;
-    private float _upgradeAppPipePrice = 50.0f;
-    private float _upgradeIncomePrice = 7.0f;
+    //Fun Rotation Speed
+    private float _funRotationSpeed = 1.0f;
 
     //Sliders
     private float _heatAmount = 0f;
@@ -43,11 +46,15 @@ public class MCCGameManager : MonoBehaviour
     private int _incomeLevelCounter = 1;
 
     private List<float> _speedAndIncomePriceList = new List<float> {7.0f, 7.3f, 7.7f, 8.1f, 8.5f, 8.9f, 12.1f, 16.3f, 21.1f, 27.5f};
-    private List<float> _pipePriceList = new List<float> { 50.0f, 100.0f };
+    private List<float> _pipePriceList = new List<float> { 50.0f, 100.0f, 150.0f, 200.0f };
+
+    private int _funLevel = 1;
 
     private void Start()
     {
         _uiManager = GetComponent<MCCUIManager>();
+        _coinAudioSource = GetComponent<AudioSource>();
+        _uiManager.UpdateScore(_score, false);
         #region Events Registration
         MCCEventManager.current.ClickOnScreen += OnScreenTapped;
         MCCEventManager.current.SpeedButtonClick += OnSpeedButtonClicked;
@@ -63,6 +70,7 @@ public class MCCGameManager : MonoBehaviour
     private void Update()
     {
         UpdateButtonActivePassive();
+        RotateFun();
     }
 
     private void OnDisable()
@@ -82,25 +90,28 @@ public class MCCGameManager : MonoBehaviour
     {
         Debug.Log("OnScreenTapped");
         _bigPipeIncoinAnime.SetTrigger(AnimeConst.sendCoinToBigPipe);
-        
     }
 
     private void OnSpeedButtonClicked()
     {
         Debug.Log("OnSpeedButtonClicked");
-        _score -= _upgradeSpeedPrice;
+        _score -= _speedAndIncomePriceList[_speedLevelCounter - 1];
         _speedLevelCounter++;
-        _uiManager.UpdateScore(_score);
-        _uiManager.UpdateSpeedButtonView(_speedLevelCounter, _speedAndIncomePriceList[_speedLevelCounter - 1]);
+        _uiManager.UpdateScore(_score, false);
+        _uiManager.UpdateSpeedButtonView(
+            _speedLevelCounter,
+            _speedAndIncomePriceList[_speedLevelCounter - 1],
+            _speedLevelCounter + _incomeLevelCounter
+            );
         //TODO: DO Something with Speed!
     }
 
     private void OnAddPipeButtonClicked()
     {
         Debug.Log("OnAddPipeButtonClicked");
-        _score -= _upgradeAppPipePrice;
+        _score -= _pipePriceList[_pipeCount - 1];
         _pipeCount++;
-        _uiManager.UpdateScore(_score);
+        _uiManager.UpdateScore(_score, false);
         _uiManager.UpdateAddPipeButtonView(_pipePriceList[1]);
         //TODO: DO Something with Pipe!
 
@@ -109,10 +120,14 @@ public class MCCGameManager : MonoBehaviour
     private void OnIncomeButtonClicked()
     {
         Debug.Log("OnIncomeButtonClicked");
-        _score -= _upgradeIncomePrice;
+        _score -= _speedAndIncomePriceList[_incomeLevelCounter - 1];
         _incomeLevelCounter++;
-        _uiManager.UpdateScore(_score);
-        _uiManager.UpdateIncomeButtonView(_incomeLevelCounter, _speedAndIncomePriceList[_speedLevelCounter - 1]);
+        _uiManager.UpdateScore(_score, false);
+        _uiManager.UpdateIncomeButtonView(
+            _incomeLevelCounter,
+            _speedAndIncomePriceList[_incomeLevelCounter - 1],
+            _speedLevelCounter + _incomeLevelCounter
+            );
         //TODO: DO SOmething with Income!
     }
 
@@ -128,11 +143,10 @@ public class MCCGameManager : MonoBehaviour
 
     private void OnStartSmallCoinAnimeTriggered()
     {
-        foreach(Animator animator in _smallPipeInCoinAnimeList)
+        for(int x = 1; x < _pipeCount; x++)
         {
-            animator.SetTrigger(AnimeConst.sendCoinToSmallPipe);
-        }
-        
+            _smallPipeInCoinAnimeList[x - 1].SetTrigger(AnimeConst.sendCoinToSmallPipe);
+        }        
     }
 
     public void OnCoinInPipeFinishedTriggered()
@@ -140,10 +154,16 @@ public class MCCGameManager : MonoBehaviour
         Debug.Log("OnCoinInPipeFinishedTriggered");
         GenerateCoin();
 
-        foreach (Animator animator in _moneyFloatAnimetorList)
+        for (int x = 0; x < _pipeCount; x++)
         {
-            animator.SetTrigger(AnimeConst.moneyFloat);
+            _moneyFloatAnimetorList[x].SetTrigger(AnimeConst.moneyFloat);
         }
+
+        _coinAudioSource.Play();
+
+        //Update score
+        _score += _pipeCount;
+        _uiManager.UpdateScore(_score, true);
 
     }
     #endregion
@@ -183,30 +203,30 @@ public class MCCGameManager : MonoBehaviour
     private void UpdateButtonActivePassive()
     {
         ///Speed Button
-        if (_score >= _upgradeSpeedPrice && !_speedButton.enabled)
+        if (_score >= _speedAndIncomePriceList[_speedLevelCounter - 1] && !_speedButton.interactable)
         {
             _speedButton.interactable = true;
-        } else if (_score < _upgradeSpeedPrice && _speedButton.enabled)
+        } else if (_score < _speedAndIncomePriceList[_speedLevelCounter - 1] && _speedButton.interactable)
         {
             _speedButton.interactable = false;
         }
 
         ///Add Pipe Button
-        if (_score >= _upgradeAppPipePrice && !_addPipeButton.enabled && _pipeCount < 4)
+        if (_score >= _pipePriceList[_pipeCount - 1] && !_addPipeButton.interactable && _pipeCount < 4)
         {
             _addPipeButton.interactable = true;
         }
-        else if ((_score < _upgradeAppPipePrice || _pipeCount == 4) && _addPipeButton.enabled)
+        else if ((_score < _pipePriceList[_pipeCount - 1] || _pipeCount == 4) && _addPipeButton.interactable)
         {
             _addPipeButton.interactable = false;
         }
 
         ///Income Button
-        if (_score >= _upgradeIncomePrice && !_incomeButton.enabled)
+        if (_score >= _speedAndIncomePriceList[_incomeLevelCounter - 1] && !_incomeButton.interactable)
         {
             _incomeButton.interactable = true;
         }
-        else if (_score < _upgradeIncomePrice && _incomeButton.enabled)
+        else if (_score < _speedAndIncomePriceList[_incomeLevelCounter - 1] && _incomeButton.interactable)
         {
             _incomeButton.interactable = false;
         }
@@ -229,6 +249,21 @@ public class MCCGameManager : MonoBehaviour
         else if (_speedLevelCounter + _incomeLevelCounter < 10 && _AddNewGpuPanelButton.activeInHierarchy)
         {
             _AddNewGpuPanelButton.SetActive(false);
+        }
+    }
+
+    private void RotateFun()
+    {
+        if (_funLevel == 1)
+        {
+            _funLevel1.transform.Rotate(0, 2 * _funRotationSpeed * Time.deltaTime, 0);
+        }
+        else if (_funLevel == 2)
+        {
+            foreach(GameObject gO in _funLeven2List)
+            {
+                gO.transform.Rotate(0, 2 * _funRotationSpeed * Time.deltaTime, 0);
+            }
         }
     }
 
