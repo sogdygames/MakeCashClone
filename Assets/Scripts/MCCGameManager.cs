@@ -43,7 +43,7 @@ public class MCCGameManager : MonoBehaviour
     private AudioSource _coinAudioSource;
 
     //Score and Target
-    private float _score = 60.0f;
+    private float _score = 20.0f;
     private float _target = 1000.0f;
 
     //Fun Rotation Speed
