@@ -16,6 +16,9 @@ public class MCCGameManager : MonoBehaviour
     [SerializeField] private GameObject[] _whiteCoinList;
     [SerializeField] private GameObject[] _orangeCoinList;
 
+    [Header("Pipes")]
+    [SerializeField] private GameObject[] _pipesList;
+
     [Header("Buttons")]
     [SerializeField] private Button _speedButton;
     [SerializeField] private Button _addPipeButton;
@@ -27,15 +30,20 @@ public class MCCGameManager : MonoBehaviour
     [SerializeField] private GameObject _funLevel1;
     [SerializeField] private GameObject[] _funLeven2List;
 
-    [Header("Fire Effects")]
+    [Header("GPUs")]
+    [SerializeField] private GameObject _gpu1;
+    [SerializeField] private GameObject _gpu2;
+
+    [Header("Effects")]
     [SerializeField] private GameObject _smallFireEfffect;
     [SerializeField] private GameObject _bigFireEffect;
+    [SerializeField] private GameObject _newGpuEffect;
 
     private MCCUIManager _uiManager;
     private AudioSource _coinAudioSource;
 
     //Score and Target
-    private float _score = 20.0f;
+    private float _score = 60.0f;
     private float _target = 1000.0f;
 
     //Fun Rotation Speed
@@ -52,13 +60,16 @@ public class MCCGameManager : MonoBehaviour
     private List<float> _speedAndIncomePriceList = new List<float> {7.0f, 7.3f, 7.7f, 8.1f, 8.5f, 8.9f, 12.1f, 16.3f, 21.1f, 27.5f};
     private List<float> _pipePriceList = new List<float> { 50.0f, 100.0f, 150.0f, 200.0f };
 
-    private int _gpuLevel = 2;
+    private int _gpuLevel = 1;
+
+    private float _winAmount = 1.0f;
 
     private void Start()
     {
         _uiManager = GetComponent<MCCUIManager>();
         _coinAudioSource = GetComponent<AudioSource>();
         _uiManager.UpdateScore(_score, false);
+        _newGpuEffect.SetActive(false);
         #region Events Registration
         MCCEventManager.current.ClickOnScreen += OnScreenTapped;
         MCCEventManager.current.SpeedButtonClick += OnSpeedButtonClicked;
@@ -76,6 +87,7 @@ public class MCCGameManager : MonoBehaviour
         UpdateButtonActivePassive();
         RotateFun();
         IncreaseHeatSlider();
+        _uiManager.SetBurnSliderFillColor(_currentValue);
         ControlBurnEffects();
     }
 
@@ -116,7 +128,7 @@ public class MCCGameManager : MonoBehaviour
             _speedAndIncomePriceList[_speedLevelCounter - 1],
             _speedLevelCounter + _incomeLevelCounter
             );
-        //TODO: DO Something with Speed!
+        UpgradeSpeed(_speedLevelCounter);
     }
 
     private void OnAddPipeButtonClicked()
@@ -126,7 +138,7 @@ public class MCCGameManager : MonoBehaviour
         _pipeCount++;
         _uiManager.UpdateScore(_score, false);
         _uiManager.UpdateAddPipeButtonView(_pipePriceList[1]);
-        //TODO: DO Something with Pipe!
+        AddPipe(_pipeCount - 2);
 
     }
 
@@ -136,17 +148,32 @@ public class MCCGameManager : MonoBehaviour
         _score -= _speedAndIncomePriceList[_incomeLevelCounter - 1];
         _incomeLevelCounter++;
         _uiManager.UpdateScore(_score, false);
+        _winAmount = (1.0f + ((float) _incomeLevelCounter * 3 / 10)) * _gpuLevel;
         _uiManager.UpdateIncomeButtonView(
             _incomeLevelCounter,
             _speedAndIncomePriceList[_incomeLevelCounter - 1],
-            _speedLevelCounter + _incomeLevelCounter
+            _speedLevelCounter + _incomeLevelCounter,
+            _winAmount
             );
-        //TODO: DO SOmething with Income!
     }
 
     private void OnNewGPUButtonClicked()
     {
         Debug.Log("OnNewGPUButtonClicked");
+        _gpuLevel++;
+        _gpu1.SetActive(false);
+        _gpu2.SetActive(true);
+        _newGpuEffect.SetActive(true);
+        DOVirtual.DelayedCall(1.0f, () => {
+            _newGpuEffect.SetActive(false);
+        });
+
+        _AddNewGpuPanelButton.SetActive(false);
+        _incomeLevelCounter = 1;
+        _uiManager.SetNewGpuSlider((float)_incomeLevelCounter / 10.0f);
+
+
+
     }
 
     private void OnMergePipeButtonClicked()
@@ -175,7 +202,7 @@ public class MCCGameManager : MonoBehaviour
         _coinAudioSource.Play();
 
         //Update score
-        _score += _pipeCount;
+        _score += _pipeCount * _gpuLevel * _winAmount;
         _uiManager.UpdateScore(_score, true);
 
     }
@@ -257,7 +284,8 @@ public class MCCGameManager : MonoBehaviour
         /// Add New GPU Panel
         if (_speedLevelCounter + _incomeLevelCounter == 10 && !_AddNewGpuPanelButton.activeInHierarchy) 
         {
-            _AddNewGpuPanelButton.SetActive(true);
+            if (_gpuLevel == 1)
+                _AddNewGpuPanelButton.SetActive(true);
         }
         else if (_speedLevelCounter + _incomeLevelCounter < 10 && _AddNewGpuPanelButton.activeInHierarchy)
         {
@@ -346,6 +374,18 @@ public class MCCGameManager : MonoBehaviour
             if (_smallFireEfffect.activeInHierarchy)
                 _smallFireEfffect.SetActive(false);
         }
+    }
+
+    private void UpgradeSpeed(int level) {
+        _bigPipeIncoinAnimator.speed = 1.0f + ((float)level / 10.0f);
+        
+        foreach (Animator animator in _smallPipeInCoinAnimatorList) {
+            animator.speed = 1.0f + ((float)level / 10.0f);
+        }
+    }
+
+    private void AddPipe(int index) {
+        _pipesList[index].SetActive(true);
     }
 
 }

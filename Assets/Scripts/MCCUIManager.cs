@@ -30,8 +30,13 @@ public class MCCUIManager : MonoBehaviour
     [SerializeField] private Slider _newGpuSlider;
     [SerializeField] private Slider _burnSlider;
 
+    [SerializeField] private Image _burnSliderFillImage;
+
     [Header("Animators")]
     [SerializeField] private Animator _scoreAnimator;
+
+    [Header("Win Amounts")]
+    [SerializeField] private TextMeshProUGUI[] _winAmountList;
 
     private void Start()
     {
@@ -62,12 +67,14 @@ public class MCCUIManager : MonoBehaviour
         _addPipePrice.text = "$" + string.Format("{0:0.0}", price);
     }
 
-    public void UpdateIncomeButtonView(int level, float price, int totalLevel)
+    public void UpdateIncomeButtonView(int level, float price, int totalLevel, float winPrice)
     {
         _incomeLevel.text = "Level " + level.ToString();
         _incomePrice.text = "$" + string.Format("{0:0.0}", price);
 
         SetNewGpuSlider((float) totalLevel / 10.0f);
+
+        UpdateWinAmountsView(winPrice);
     }
 
     public void UpdateTarget(float value)
@@ -88,7 +95,21 @@ public class MCCUIManager : MonoBehaviour
         }
     }
 
-    private void SetNewGpuSlider(float value)
+    public void SetBurnSlider(float value)
+    {
+        if (value <= 1)
+        {
+            _burnSlider.value = value;
+        }
+    }
+
+    public void SetBurnSliderFillColor(float value) {
+        if (value <= 0.5f) _burnSliderFillImage.color = Color.green;
+        else if (value > 0.5f && value <= 0.75f) _burnSliderFillImage.color = new Color(1.0f, 0.64f, 0.0f);//orange
+        else if (value > 0.75f) _burnSliderFillImage.color = Color.red;
+    }
+
+    public void SetNewGpuSlider(float value)
     {
         Debug.Log("MCCUIManager, SetNewGpuSlider, value: " + value.ToString());
         if (value <= 1)
@@ -97,12 +118,11 @@ public class MCCUIManager : MonoBehaviour
         }
     }
 
-    public void SetBurnSlider(float value)
-    {
-        if (value <= 1)
-        {
-            _burnSlider.value = value;
+    private void UpdateWinAmountsView(float amount) {
+        foreach(var text in _winAmountList) {
+            text.text = "$" + string.Format("{0:0.0}", amount);
         }
     }
+
 
 }
