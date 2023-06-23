@@ -48,7 +48,7 @@ public class MCCGameManager : MonoBehaviour
     private List<float> _speedAndIncomePriceList = new List<float> {7.0f, 7.3f, 7.7f, 8.1f, 8.5f, 8.9f, 12.1f, 16.3f, 21.1f, 27.5f};
     private List<float> _pipePriceList = new List<float> { 50.0f, 100.0f, 150.0f, 200.0f };
 
-    private int _funLevel = 1;
+    private int _gpuLevel = 2;
 
     private void Start()
     {
@@ -254,15 +254,15 @@ public class MCCGameManager : MonoBehaviour
 
     private void RotateFun()
     {
-        if (_funLevel == 1)
+        if (_gpuLevel == 1)
         {
-            _funLevel1.transform.Rotate(0, 2 * _funRotationSpeed * Time.deltaTime, 0);
+            _funLevel1.transform.Rotate(0, 0, 50 * _funRotationSpeed * Time.deltaTime);
         }
-        else if (_funLevel == 2)
+        else if (_gpuLevel == 2)
         {
             foreach(GameObject gO in _funLeven2List)
             {
-                gO.transform.Rotate(0, 2 * _funRotationSpeed * Time.deltaTime, 0);
+                gO.transform.Rotate(0, 0, 50 * _funRotationSpeed * Time.deltaTime);
             }
         }
     }
