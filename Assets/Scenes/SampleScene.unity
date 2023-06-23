@@ -3235,6 +3235,8 @@ MonoBehaviour:
   - {fileID: 846614474}
   - {fileID: 378869119}
   - {fileID: 723875290}
+  _multiplierAmountList:
+  - {fileID: 1119718561}
 --- !u!82 &183986316
 AudioSource:
   m_ObjectHideFlags: 0
@@ -13784,6 +13786,7 @@ Transform:
   - {fileID: 8541442431344488641}
   - {fileID: 1075150841}
   - {fileID: 984081208}
+  - {fileID: 1936606237}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -28527,7 +28530,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1936606236}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -28535,8 +28538,8 @@ Transform:
   - {fileID: 668064827}
   - {fileID: 565463507}
   - {fileID: 1039366975}
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_Father: {fileID: 929253932}
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1953861960
 PrefabInstance:

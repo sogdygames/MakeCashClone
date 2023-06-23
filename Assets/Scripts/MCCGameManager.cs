@@ -16,7 +16,7 @@ public class MCCGameManager : MonoBehaviour
     [SerializeField] private GameObject[] _whiteCoinList;
     [SerializeField] private GameObject[] _orangeCoinList;
 
-    [Header("Pipes")]
+    [Header("Small Pipes")]
     [SerializeField] private GameObject[] _pipesList;
 
     [Header("Buttons")]
@@ -63,6 +63,8 @@ public class MCCGameManager : MonoBehaviour
     private int _gpuLevel = 1;
 
     private float _winAmount = 1.0f;
+
+    bool _pipeMerged = false;
 
     private void Start()
     {
@@ -179,6 +181,12 @@ public class MCCGameManager : MonoBehaviour
     private void OnMergePipeButtonClicked()
     {
         Debug.Log("OnMergePipeButtonClicked");
+        foreach(GameObject smallPipe in _pipesList) {
+            smallPipe.SetActive(false);
+        }
+        _pipeMerged = true;
+        _pipeCount = 1;
+        UpgradePipe1();
     }
 
     private void OnStartSmallCoinAnimeTriggered()
@@ -386,6 +394,12 @@ public class MCCGameManager : MonoBehaviour
 
     private void AddPipe(int index) {
         _pipesList[index].SetActive(true);
+    }
+
+    private void UpgradePipe1() {
+        _winAmount *= 4;
+        _uiManager.UpgradeMultiplierOfPipe1();
+
     }
 
 }

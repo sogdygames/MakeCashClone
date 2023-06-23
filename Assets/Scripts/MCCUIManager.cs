@@ -38,6 +38,10 @@ public class MCCUIManager : MonoBehaviour
     [Header("Win Amounts")]
     [SerializeField] private TextMeshProUGUI[] _winAmountList;
 
+    [Header("Multiplier Amounts")]
+    [SerializeField] private TextMeshProUGUI[] _multiplierAmountList;
+
+
     private void Start()
     {
         SetNewGpuSlider(0.2f);
@@ -122,6 +126,10 @@ public class MCCUIManager : MonoBehaviour
         foreach(var text in _winAmountList) {
             text.text = "$" + string.Format("{0:0.0}", amount);
         }
+    }
+
+    public void UpgradeMultiplierOfPipe1() {
+        _multiplierAmountList[0].text = "X4";
     }
 
 
