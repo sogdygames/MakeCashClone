@@ -5,4 +5,5 @@ public class AnimeConst
     public const string moneyFloat = "MoneyFloat";
     public const string scoreAnimate = "ScoreAnimate";
     public const string normalBurnAnimate = "NormalBurnAnimate";
+    public const string hardBurnAnimate = "HardBurnAnimate";
 }

@@ -2890,8 +2890,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 532d560ef23e740db9ac0a0ee4e0b2b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bigPipeIncoinAnime: {fileID: 712345422}
-  _smallPipeInCoinAnimeList:
+  _bigPipeIncoinAnimator: {fileID: 712345422}
+  _burnPipeAnimator: {fileID: 1860653671}
+  _smallPipeInCoinAnimatorList:
   - {fileID: 904346721}
   - {fileID: 757396227}
   - {fileID: 1909644683}

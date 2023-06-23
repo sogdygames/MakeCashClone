@@ -5,9 +5,10 @@ using System.Collections.Generic;
 
 public class MCCGameManager : MonoBehaviour
 {
-
-    [SerializeField] private Animator _bigPipeIncoinAnime;
-    [SerializeField] private Animator[] _smallPipeInCoinAnimeList;
+    [Header("Animators")]
+    [SerializeField] private Animator _bigPipeIncoinAnimator;
+    [SerializeField] private Animator _burnPipeAnimator;
+    [SerializeField] private Animator[] _smallPipeInCoinAnimatorList;
     [SerializeField] private Animator[] _moneyFloatAnimetorList;
 
     [Header("Generate Coin Related")]
@@ -37,9 +38,8 @@ public class MCCGameManager : MonoBehaviour
     private float _funRotationSpeed = 1.0f;
 
     //Sliders
-    private float _heatAmount = 0f;
-    private float _targetAmount = 0f;
-    private float _newGpuAmount = 0f;
+    //private float _targetAmount = 0f;
+    //private float _newGpuAmount = 0f;
 
     private int _pipeCount = 1;
     private int _speedLevelCounter = 1;
@@ -89,7 +89,7 @@ public class MCCGameManager : MonoBehaviour
     private void OnScreenTapped()
     {
         Debug.Log("OnScreenTapped");
-        _bigPipeIncoinAnime.SetTrigger(AnimeConst.sendCoinToBigPipe);
+        _bigPipeIncoinAnimator.SetTrigger(AnimeConst.sendCoinToBigPipe);
     }
 
     private void OnSpeedButtonClicked()
@@ -145,7 +145,7 @@ public class MCCGameManager : MonoBehaviour
     {
         for(int x = 1; x < _pipeCount; x++)
         {
-            _smallPipeInCoinAnimeList[x - 1].SetTrigger(AnimeConst.sendCoinToSmallPipe);
+            _smallPipeInCoinAnimatorList[x - 1].SetTrigger(AnimeConst.sendCoinToSmallPipe);
         }        
     }
 
@@ -266,6 +266,24 @@ public class MCCGameManager : MonoBehaviour
             }
         }
     }
+
+    //private float _heatAmount = 0f;
+    //private bool _isHeatSliderIncreasing = false;
+    //private void IncreaseHeatSlider()
+    //{
+    //    float _targetAmount = 0.1f;
+
+    //    if (_heatAmount < _targetAmount)
+    //    {
+    //        _isHeatSliderIncreasing = true;
+
+
+    //    }
+    //    else
+    //    {
+    //        _isHeatSliderIncreasing = false;
+    //    }
+    //}
 
 }
 
