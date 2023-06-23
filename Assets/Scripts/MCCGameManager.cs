@@ -27,6 +27,10 @@ public class MCCGameManager : MonoBehaviour
     [SerializeField] private GameObject _funLevel1;
     [SerializeField] private GameObject[] _funLeven2List;
 
+    [Header("Fire Effects")]
+    [SerializeField] private GameObject _smallFireEfffect;
+    [SerializeField] private GameObject _bigFireEffect;
+
     private MCCUIManager _uiManager;
     private AudioSource _coinAudioSource;
 
@@ -71,6 +75,8 @@ public class MCCGameManager : MonoBehaviour
     {
         UpdateButtonActivePassive();
         RotateFun();
+        IncreaseHeatSlider();
+        ControlBurnEffects();
     }
 
     private void OnDisable()
@@ -89,7 +95,14 @@ public class MCCGameManager : MonoBehaviour
     private void OnScreenTapped()
     {
         Debug.Log("OnScreenTapped");
-        _bigPipeIncoinAnimator.SetTrigger(AnimeConst.sendCoinToBigPipe);
+        if (!_gpuBurning) {
+            _bigPipeIncoinAnimator.SetTrigger(AnimeConst.sendCoinToBigPipe);
+            if (_currentValue < 0.5)
+                _burnPipeAnimator.SetTrigger(AnimeConst.normalBurnAnimate);
+            else
+                _burnPipeAnimator.SetTrigger(AnimeConst.hardBurnAnimate);
+            _tappedScreen = true;
+        }
     }
 
     private void OnSpeedButtonClicked()
@@ -252,38 +265,88 @@ public class MCCGameManager : MonoBehaviour
         }
     }
 
+
+    int _funSpeedMultiplier = 50;
+
     private void RotateFun()
     {
+        if (_currentValue <= 0.5) _funSpeedMultiplier = 50;
+        if (_currentValue > 0.5) _funSpeedMultiplier = 150;
+        if (_currentValue > 0.75) _funSpeedMultiplier = 300; 
+
         if (_gpuLevel == 1)
         {
-            _funLevel1.transform.Rotate(0, 0, 50 * _funRotationSpeed * Time.deltaTime);
+            _funLevel1.transform.Rotate(0, 0, _funSpeedMultiplier * _funRotationSpeed * Time.deltaTime);
         }
         else if (_gpuLevel == 2)
         {
             foreach(GameObject gO in _funLeven2List)
             {
-                gO.transform.Rotate(0, 0, 50 * _funRotationSpeed * Time.deltaTime);
+                gO.transform.Rotate(0, 0, _funSpeedMultiplier * _funRotationSpeed * Time.deltaTime);
             }
         }
     }
 
-    //private float _heatAmount = 0f;
-    //private bool _isHeatSliderIncreasing = false;
-    //private void IncreaseHeatSlider()
-    //{
-    //    float _targetAmount = 0.1f;
+    private float _currentValue = 0;
+    private float _targetValue = 0;
+    private bool _targetReached = false;
+    private bool _tappedScreen = false;
+    private bool _gpuBurning = false;
 
-    //    if (_heatAmount < _targetAmount)
-    //    {
-    //        _isHeatSliderIncreasing = true;
+    private void IncreaseHeatSlider() {
+        if (_tappedScreen) {
+            _targetReached = false;
+            _tappedScreen = false;
+            _targetValue = _currentValue + 0.1f;
+            if (_targetValue > 1) {
+                _targetValue = 1.0f;
+                _gpuBurning = true;
+            }
+        }
 
+        if (_currentValue <0) {
+            _currentValue = 0;
+            _gpuBurning = false;
+        }
 
-    //    }
-    //    else
-    //    {
-    //        _isHeatSliderIncreasing = false;
-    //    }
-    //}
+        if (_currentValue >= 0) {
+            if (_targetReached) {
+                _currentValue -= 0.3f * Time.deltaTime;
+                _uiManager.SetBurnSlider(_currentValue);
+            } else {
+                _currentValue += 0.3f * Time.deltaTime;
+                _uiManager.SetBurnSlider(_currentValue);
+            }
+        }
+
+        if (_currentValue >= _targetValue) {
+            _targetReached = true;
+        }
+    }
+
+    private void ControlBurnEffects() {
+
+        if (_currentValue <= 0.5) {
+
+            if (_smallFireEfffect.activeInHierarchy)
+                _smallFireEfffect.SetActive(false);
+
+            if (_bigFireEffect.activeInHierarchy)
+                _bigFireEffect.SetActive(false);
+
+        } else if (_currentValue > 0.5 && !_smallFireEfffect.activeInHierarchy) {
+
+            _smallFireEfffect.SetActive(true);
+            if (_bigFireEffect.activeInHierarchy)
+                _bigFireEffect.SetActive(false);
+
+        } else if (_currentValue > 0.75 && !_bigFireEffect.activeInHierarchy) {
+
+            _bigFireEffect.SetActive(true);
+            if (_smallFireEfffect.activeInHierarchy)
+                _smallFireEfffect.SetActive(false);
+        }
+    }
 
 }
 
